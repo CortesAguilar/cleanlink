@@ -21,7 +21,8 @@ function App() {
   return (
     <main style={{ textAlign: 'center', padding: '4rem 1rem' }}>
       <h1>CleanLink</h1>
-      <p>Plataforma que conecta empresas con proveedores de limpieza</p>
+      <p>Plataforma que conecta empresas con proveedores de limpieza.</p>
+      <p>Prueba de commit 6:55 pm.</p>
       <p>API: {api}</p>
       <p>Base de datos: {db}</p>
     </main>
