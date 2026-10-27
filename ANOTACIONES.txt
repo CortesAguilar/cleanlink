@@ -1,0 +1,10 @@
+CLEANLINK - ANOTACIONES
+Reglas y decisiones del producto para tener presentes. Aún no todas están implementadas.
+
+------------------------------------------------------------
+1. Búsqueda sin sesión, contratación con sesión
+------------------------------------------------------------
+- Un usuario puede buscar y explorar proveedores SIN iniciar sesión.
+- Al dar clic en "Solicitar", "Contratar" o cualquier acción para contratar un
+  servicio, se le pide iniciar sesión (o crear cuenta).
+- Estado: pendiente. Aún no hay vistas de inicio de sesión.
