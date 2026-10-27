@@ -1,111 +1,220 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens del sistema de diseño CleanLink.
+ * Fuente: https://claude.ai/artifact/EUJawq2gHfk314a78qGZ2C (project/tokens.json)
+ * Si cambia el sistema de diseño, actualizar estos valores a mano.
+ *
+ * Los colores viven en variables (--cl-*) que cambian con el tema, y @theme
+ * las expone como utilidades: bg-surface, text-ink, border-line, bg-primary...
+ * Así el modo oscuro funciona solo, sin escribir dark: en cada clase.
+ *
+ * Tema: sigue al sistema operativo por defecto. Para forzarlo,
+ * poner data-theme="light" o data-theme="dark" en <html>.
+ *
+ * La página design-system.html lee este archivo y pinta todo lo que hay
+ * aquí: cualquier token nuevo aparece ahí sin tocar nada más.
+ */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --cl-surface: #f8fcfd;
+  --cl-surface-raised: #ffffff;
+  --cl-surface-tint: #e8f7f8;
+  --cl-line: #dae8ec;
+  --cl-ink: #0f2a33;
+  --cl-ink-muted: #4b6470;
+  --cl-primary: #0b7f86;
+  --cl-on-primary: #ffffff;
+  --cl-primary-soft: #d8f5f3;
+  --cl-on-primary-soft: #0a5f66;
+  --cl-secondary: #1a6fb5;
+  --cl-on-secondary: #ffffff;
+  --cl-secondary-soft: #e2f2fd;
+  --cl-on-secondary-soft: #165a94;
+  --cl-success: #1a8456;
+  --cl-on-success: #ffffff;
+  --cl-warning: #e8a321;
+  --cl-on-warning: #0f2a2e;
+  --cl-danger: #c93b3b;
+  --cl-on-danger: #ffffff;
+  --cl-shadow-sm: 0 1px 2px rgba(15, 42, 46, 0.06), 0 1px 3px rgba(15, 42, 46, 0.08);
+  --cl-shadow-md: 0 8px 24px rgba(11, 127, 134, 0.12);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+  :root:not([data-theme='light']) {
+    --cl-surface: #0a1a20;
+    --cl-surface-raised: #11262d;
+    --cl-surface-tint: #133a3c;
+    --cl-line: #22393f;
+    --cl-ink: #e6f2f3;
+    --cl-ink-muted: #9bb3ba;
+    --cl-primary: #40d6ce;
+    --cl-on-primary: #05262a;
+    --cl-primary-soft: #10403f;
+    --cl-on-primary-soft: #95e8e3;
+    --cl-secondary: #7cc6f7;
+    --cl-on-secondary: #08203a;
+    --cl-secondary-soft: #13324d;
+    --cl-on-secondary-soft: #a6d8fa;
+    --cl-success: #4cc98d;
+    --cl-on-success: #062018;
+    --cl-warning: #e8a93a;
+    --cl-on-warning: #2a1a02;
+    --cl-danger: #f07272;
+    --cl-on-danger: #2a0909;
+    --cl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --cl-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+:root[data-theme='dark'] {
+  --cl-surface: #0a1a20;
+  --cl-surface-raised: #11262d;
+  --cl-surface-tint: #133a3c;
+  --cl-line: #22393f;
+  --cl-ink: #e6f2f3;
+  --cl-ink-muted: #9bb3ba;
+  --cl-primary: #40d6ce;
+  --cl-on-primary: #05262a;
+  --cl-primary-soft: #10403f;
+  --cl-on-primary-soft: #95e8e3;
+  --cl-secondary: #7cc6f7;
+  --cl-on-secondary: #08203a;
+  --cl-secondary-soft: #13324d;
+  --cl-on-secondary-soft: #a6d8fa;
+  --cl-success: #4cc98d;
+  --cl-on-success: #062018;
+  --cl-warning: #e8a93a;
+  --cl-on-warning: #2a1a02;
+  --cl-danger: #f07272;
+  --cl-on-danger: #2a0909;
+  --cl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --cl-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/*
+ * Formato que lee la página design-system.html (no cambiarlo):
+ * - Un comentario solo en su línea abre un grupo.
+ * - Un comentario al final de una declaración es su nota de uso.
+ */
+@theme inline {
+  /* Superficies */
+  --color-surface: var(--cl-surface); /* Fondo de página. */
+  --color-surface-raised: var(--cl-surface-raised); /* Tarjetas, perfiles, modales y menús. */
+  --color-surface-tint: var(--cl-surface-tint); /* Bloques de relieve: banners, secciones destacadas, estados vacíos. */
+  --color-line: var(--cl-line); /* Divisores, bordes de tarjetas e inputs en reposo. */
+
+  /* Texto */
+  --color-ink: var(--cl-ink); /* Texto principal sobre cualquier superficie. */
+  --color-ink-muted: var(--cl-ink-muted); /* Texto secundario, metadatos, placeholders. */
+
+  /* Primario (aqua/turquesa): acciones y Personas */
+  --color-primary: var(--cl-primary); /* Botón principal, links, tab activa, iconos activos. */
+  --color-on-primary: var(--cl-on-primary); /* Texto e iconos sobre primary. */
+  --color-primary-soft: var(--cl-primary-soft); /* Chips seleccionados, filtros activos, badge Persona. */
+  --color-on-primary-soft: var(--cl-on-primary-soft); /* Texto sobre primary-soft. */
+
+  /* Secundario (azul cielo): acciones secundarias y Grupos */
+  --color-secondary: var(--cl-secondary); /* Acciones secundarias de relleno e identidad de los Grupos. */
+  --color-on-secondary: var(--cl-on-secondary); /* Texto sobre secondary. */
+  --color-secondary-soft: var(--cl-secondary-soft); /* Badge Grupo y tarjetas de equipo destacadas. */
+  --color-on-secondary-soft: var(--cl-on-secondary-soft); /* Texto sobre secondary-soft. */
+
+  /* Estados */
+  --color-success: var(--cl-success); /* Verificado, servicio completado, pago confirmado. */
+  --color-on-success: var(--cl-on-success); /* Texto sobre success. */
+  --color-warning: var(--cl-warning); /* Pendiente, por confirmar; también las estrellas de calificación. */
+  --color-on-warning: var(--cl-on-warning); /* Texto sobre warning. */
+  --color-danger: var(--cl-danger); /* Errores, cancelaciones, reportes. Nunca decorativo. */
+  --color-on-danger: var(--cl-on-danger); /* Texto sobre danger. */
+
+  /* Sombras */
+  --shadow-sm: var(--cl-shadow-sm); /* Tarjetas en reposo. */
+  --shadow-md: var(--cl-shadow-md); /* Tarjeta al pasar el cursor, menús, modales. */
+}
+
+@theme {
+  /* Identidad (igual en ambos temas): ilustración y bloques grandes, sin texto blanco encima */
+  --color-primary-bright: #2ed3cb; /* Aqua de identidad para hero e ilustración. */
+  --color-sky: #5bbef5; /* Azul cielo de identidad para hero e ilustración. */
+
+  /* Tipografía */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; /* Única familia. Pesos 400, 500, 600 y 700. */
+
+  /* Estilos de texto */
+  --text-hero: 48px; /* Título principal de la landing en escritorio (en móvil, display). */
+  --text-hero--line-height: 56px;
+  --text-hero--letter-spacing: -0.02em;
+  --text-hero--font-weight: 700;
+  --text-display: 40px; /* Hero de landing y títulos de marketing. */
+  --text-display--line-height: 48px;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+  --text-title: 28px; /* Título de página y nombre en perfil. */
+  --text-title--line-height: 36px;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 700;
+  --text-heading: 20px; /* Encabezados de sección y de tarjeta. */
+  --text-heading--line-height: 28px;
+  --text-heading--font-weight: 600;
+  --text-lead: 18px; /* Párrafo introductorio bajo el título del hero. */
+  --text-lead--line-height: 28px;
+  --text-lead--font-weight: 400;
+  --text-body: 16px; /* Texto general. */
+  --text-body--line-height: 24px;
+  --text-body--font-weight: 400;
+  --text-body-sm: 14px; /* Texto en tarjetas densas, descripciones cortas. */
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+  --text-label: 14px; /* Botones, tabs, chips. Calificaciones y precios nunca más pequeños. */
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 600;
+  --text-caption: 12px; /* Metadatos, badges, ayudas de formulario. */
+  --text-caption--line-height: 16px;
+  --text-caption--letter-spacing: 0.01em;
+  --text-caption--font-weight: 500;
+
+  /* Espaciado (base 4px, mismos valores que la escala de Tailwind: p-4 = 16px) */
+  --spacing-1: 4px; /* Icono a etiqueta. */
+  --spacing-2: 8px; /* Dentro de chips y badges; entre chips. */
+  --spacing-3: 12px; /* Entre filas relacionadas dentro de una tarjeta. */
+  --spacing-4: 16px; /* Padding de tarjeta y margen lateral en móvil. */
+  --spacing-6: 24px; /* Entre tarjetas y bloques. */
+  --spacing-8: 32px; /* Entre secciones. */
+  --spacing-12: 48px; /* Secciones de landing y márgenes de hero. */
+
+  /* Radios */
+  --radius-sm: 6px; /* Inputs pequeños, checkboxes. */
+  --radius-md: 12px; /* Botones, inputs, tarjetas compactas. */
+  --radius-lg: 20px; /* Tarjetas de perfil, modales, bloques hero. */
+}
+
+@layer base {
+  body {
+    @apply min-h-svh bg-surface font-sans text-body text-ink antialiased;
+  }
+
+  /* Foco de teclado: 2px de separación y 2px sólidos en primary */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
   }
 }
-p {
-  margin: 0;
-}
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Iconos de Material Symbols Outlined (ver componente Icon) */
+@utility material-symbol {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  display: inline-block;
+  flex: none;
+  user-select: none;
 }

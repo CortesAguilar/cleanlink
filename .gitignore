@@ -11,3 +11,5 @@ dist/
 # Sistema y editor
 .DS_Store
 Thumbs.db
+# Documentos locales (no se suben)
+*.docx

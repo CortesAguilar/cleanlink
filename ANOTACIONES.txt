@@ -1,0 +1,86 @@
+CLEANLINK - ANOTACIONES
+Reglas y decisiones del producto para tener presentes. Aún no todas están implementadas.
+
+------------------------------------------------------------
+1. Búsqueda sin sesión, contratación con sesión
+------------------------------------------------------------
+- Un usuario puede buscar y explorar proveedores SIN iniciar sesión.
+- Al dar clic en "Solicitar", "Contratar" o cualquier acción para contratar un
+  servicio, se le pide iniciar sesión (o crear cuenta).
+- Estado: pendiente. Aún no hay vistas de inicio de sesión.
+
+------------------------------------------------------------
+2. Cuentas sin verificar no pueden publicar
+------------------------------------------------------------
+- Una cuenta SIN VERIFICAR NO PUEDE PUBLICAR.
+- Estado: pendiente. Aún no existe el flujo de verificación ni el de publicar.
+
+------------------------------------------------------------
+3. Tipos de proveedor y ubicación
+------------------------------------------------------------
+- Hay tres tipos de proveedor:
+  - Persona: un individuo.
+  - Equipo: un grupo de individuos que trabajan juntos.
+  - Empresa: toda una organización.
+- La ubicación del proveedor NO se muestra en búsquedas ni tarjetas: quien
+  ofrece el servicio va a donde se lo piden.
+- La ubicación solo va en el perfil y es SOLO ciudad y estado, nunca colonia
+  ni dirección.
+- Estado: aplicado en la tarjeta de resultados. El perfil aún no existe.
+
+------------------------------------------------------------
+4. Servicios destacados
+------------------------------------------------------------
+- Cada proveedor elige en su perfil hasta 2 servicios destacados.
+- La tarjeta de resultados muestra solo esos 2.
+- El perfil muestra TODOS sus servicios.
+- Al filtrar o buscar se toman en cuenta TODOS los servicios del proveedor,
+  no solo los que se ven en la tarjeta.
+- Estado: aplicado en la tarjeta y en los filtros de resultados (datos de prueba).
+  Falta la pantalla de perfil donde se eligen.
+
+------------------------------------------------------------
+5. Horario de atención (de sucursal)
+------------------------------------------------------------
+- Es parte de la información del proveedor. Tiene tres opciones:
+  - Disponible siempre.
+  - Horario definido: días y horas (ej. "Lun–sáb · 08:00–18:00").
+  - Sin definir: última opción, si el proveedor aún no lo establece.
+- Estado: aplicado en la tarjeta de resultados (datos de prueba).
+
+------------------------------------------------------------
+6. Personas por proveedor
+------------------------------------------------------------
+- Persona: 1. Equipo: un número fijo. Empresa: un rango (mínimo y máximo).
+- Sirve para que el cliente descarte a quien no le alcanza: si necesita 30
+  personas, una empresa con máximo 20 no es opción.
+- Estado: pendiente. La tarjeta aún muestra solo el tipo.
+
+------------------------------------------------------------
+7. Cotización automática
+------------------------------------------------------------
+- Cada proveedor pone un precio en MXN POR METRO CUADRADO a cada servicio
+  que ofrece, y un ajuste por tipo de espacio (casa, departamento, oficina,
+  local comercial, escuela / universidad, consultorio / clínica,
+  bodega / nave industrial, renta vacacional). El ajuste vale 1.0 por defecto.
+- Los precios son FINALES (incluyen IVA). Al capturarlos se le avisa al proveedor.
+- Cada proveedor indica los m² máximos que atiende; si el cliente pide más,
+  no aparece.
+- No hay cobro mínimo.
+- El cliente elige servicio(s), tipo de espacio y m², y obtiene la cotización
+  al momento: suma de (precio por m² x m² x ajuste del espacio).
+- Si el cliente pone tipo de espacio y m² en la búsqueda, cada tarjeta de
+  resultados muestra su precio y se puede ordenar por precio.
+- Paquetes opcionales: el proveedor arma combinaciones de su catálogo con un
+  rango de personas, un rango de m² y un precio fijo (ej. ventanas +
+  limpieza profunda, 6 a 8 personas, 80 a 150 m², $X).
+- Estado: pendiente (aún sin pantalla).
+
+------------------------------------------------------------
+8. Reportes
+------------------------------------------------------------
+- El perfil de cada proveedor muestra los reportes levantados a su servicio.
+- Cualquier usuario puede levantar un reporte, haya contratado o no.
+- Los revisa el ADMIN DE PLATAFORMA: el equipo de CleanLink (la tercera parte,
+  además de clientes y proveedores). Es el único que ve reportes de todos.
+- Estado: pendiente (aún sin pantalla).

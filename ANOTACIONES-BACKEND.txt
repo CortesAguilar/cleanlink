@@ -1,0 +1,380 @@
+CLEANLINK - ANOTACIONES PARA BACKEND Y BASE DE DATOS
+Requerimientos que van saliendo del frontend. Se actualiza en cada pantalla.
+Al final se ordena como lista de tareas para backend.
+
+Fuente de verdad de las formas de datos en el frontend:
+  frontend/src/types/provider.ts
+Reglas de producto que aplican: ver ANOTACIONES.txt.
+
+
+============================================================
+A. TABLAS / ENTIDADES
+============================================================
+
+1. Usuario (cuenta)
+   - id
+   - nombre
+   - correo (único)
+   - contraseña (guardar solo el hash)
+   - foto_url (opcional)          -> el avatar ya acepta foto
+   - verificado (sí/no)           -> sin verificar NO puede publicar (regla 2)
+   - fecha_creacion
+
+2. Proveedor (quien ofrece servicios)
+   - id
+   - usuario_id                   -> cuenta dueña del perfil
+   - nombre                       -> nombre de la persona, equipo o empresa
+   - tipo: 'persona' | 'equipo' | 'empresa'   (regla 3)
+       persona -> un individuo que ofrece el servicio por su cuenta.
+       equipo  -> un grupo de individuos que trabajan juntos (cuadrilla).
+       empresa -> toda una organización formal.
+     Los tres pueden ofrecer los mismos servicios; el tipo solo describe
+     quién lo ofrece. En la interfaz se muestran como "Persona", "Equipo"
+     y "Empresa", y se puede filtrar por cada uno.
+   - Personas que trabajan (para que el cliente sepa si le alcanza):
+       persona -> 1 (no se pide).
+       equipo  -> num_personas: número fijo (ej. 6).
+       empresa -> personas_min y personas_max: rango (ej. 5 a 20).
+     Ej.: un cliente que necesita 30 personas no ve como opción a una
+     empresa con máximo 20. Debe poder filtrarse por esto.
+   - horario (horario de atención / de sucursal), una de tres opciones:
+       siempre     -> disponible siempre.
+       definido    -> días y horas definidos (ej. lun a sáb, 8:00 a 18:00).
+       sin_definir -> el proveedor aún no lo define (última opción).
+     Si es "definido" se guardan también:
+       dias        -> lista de días: lun, mar, mie, jue, vie, sab, dom
+       hora_inicio -> ej. 08:00
+       hora_fin    -> ej. 18:00
+   - m2_max                       -> metros cuadrados máximos que atiende. Si el
+                                     cliente pide más, este proveedor no aparece.
+   - ubicación: SOLO ciudad y estado (país si hiciera falta). NUNCA colonia
+     ni dirección. Se muestra en el perfil (regla 3).
+   - presentacion (texto, opcional)
+   - imagenes (opcional, varias URLs)
+   - verificado (sí/no)
+   - Campos calculados (pueden ser columnas o salir de consultas):
+     - calificacion_promedio      -> promedio de reseñas, 1 decimal (ej. 4.9)
+     - num_resenas
+     - num_solicitudes            -> para "Más solicitados" y "Lo más destacado"
+
+3. Servicio (catálogo)
+   - id
+   - nombre       -> ej. "Casas y departamentos"
+   - nombre_corto -> ej. "Casas" (el que se ve en la tarjeta)
+   - categoria: 'residencial' | 'comercial'   -> para los filtros del feed
+
+   Contenido del catálogo. Cargar solo los CONFIRMADOS; los PROPUESTOS
+   esperan decisión del equipo.
+
+   +---------------+--------------------------+----------------+--------------+------------+
+   | id            | nombre                   | nombre_corto   | categoria    | estado     |
+   +---------------+--------------------------+----------------+--------------+------------+
+   | profunda      | Limpieza profunda        | L. profunda    | residencial  | CONFIRMADO |
+   | casas         | Casas y departamentos    | Casas          | residencial  | CONFIRMADO |
+   | oficinas      | Oficinas y locales       | Oficinas       | comercial    | CONFIRMADO |
+   | ventanas      | Ventanas y fachadas      | Ventanas       | ambas        | CONFIRMADO |
+   | mudanzas      | Mudanzas (al dejar o     | Mudanzas       | residencial  | CONFIRMADO |
+   |               | llegar a un lugar)       |                |              |            |
+   +---------------+--------------------------+----------------+--------------+------------+
+   | post-obra     | Post-obra                | Post-obra      | ambas        | PROPUESTO  |
+   | tapiceria     | Alfombras y tapicería    | Tapicería      | residencial  | PROPUESTO  |
+   | desinfeccion  | Desinfección y           | Desinfección   | ambas        | PROPUESTO  |
+   |               | sanitización             |                |              |            |
+   | vacacional    | Rentas vacacionales      | Rentas vac.    | residencial  | PROPUESTO  |
+   | presion       | Lavado a presión         | Lavado presión | ambas        | PROPUESTO  |
+   | cocinas-com   | Cocinas comerciales      | Cocinas com.   | comercial    | OPCIONAL   |
+   | eventos       | Eventos                  | Eventos        | ambas        | OPCIONAL   |
+   | albercas      | Albercas                 | Albercas       | residencial  | OPCIONAL   |
+   | organizacion  | Organización de espacios | Organización   | residencial  | OPCIONAL   |
+   +---------------+--------------------------+----------------+--------------+------------+
+
+   Nota: con "ambas" la categoría tendría que permitir residencial Y comercial
+   (o ser una relación aparte). Ver pregunta C.5.
+
+
+4. Proveedor_Servicio (relación muchos a muchos)
+   - proveedor_id
+   - servicio_id
+   - destacado (sí/no)  -> MÁXIMO 2 por proveedor; los elige en su perfil.
+   - precio_mxn_por_m2  -> precio FINAL (con IVA) por m² de ese servicio (ver tabla 7).
+   Los destacados son los únicos que se ven en la tarjeta de resultados.
+   Los FILTROS y la búsqueda deben usar TODOS los servicios del proveedor,
+   no solo los destacados.
+
+5. Reseña
+   - id
+   - proveedor_id
+   - usuario_id (autor)
+   - contratacion_id              -> solo quien contrató puede reseñar
+   - calificacion (entero 1 a 5)
+   - comentario
+   - fecha
+
+6. Tipo de espacio (catálogo global)  -> lo elige el CLIENTE al contratar
+   - id
+   - nombre
+   Lista CONFIRMADA:
+     casa, departamento, oficina, local comercial, escuela / universidad,
+     consultorio / clínica, bodega / nave industrial, renta vacacional
+
+7. Cotización automática (PRIVADO del tenant; lo configura cada proveedor)
+   El proveedor configura:
+   a) Precio por m² de cada servicio que ofrece
+      -> columna precio_mxn_por_m2 en Proveedor_Servicio (tabla 4).
+   b) Ajuste por tipo de espacio -> tabla Ajuste_Espacio:
+      - proveedor_id
+      - tipo_espacio_id
+      - factor                     -> número, 1.0 por defecto (ej. oficina 1.1,
+                                     universidad 1.3). Solo cambia los que quiera.
+   c) m2_max en Proveedor (tabla 2).
+   NO hay cobro mínimo.
+
+   PRECIOS FINALES: todos los precios que captura el proveedor ya incluyen
+   IVA y cualquier otro cargo. La interfaz se lo avisa al capturarlos.
+
+   El cliente indica: servicio(s), tipo de espacio y m².
+
+   Fórmula:
+     total = suma, por cada servicio pedido, de
+             (precio_mxn_por_m2 del servicio x m² x factor del tipo de espacio)
+
+   Ej.: limpieza profunda ($15/m²) + ventanas ($10/m²) en oficina (1.1) de 100 m²
+        = 15 x 100 x 1.1  +  10 x 100 x 1.1  =  1,650 + 1,100  =  $2,750
+
+   Paquetes: si los m² del cliente están en el rango del paquete y el paquete
+   incluye los servicios pedidos, se muestra como alternativa con su precio
+   fijo (y cuánto ahorra frente a la cotización normal).
+
+8. Paquete (opcional; lo arma cada proveedor)
+   - id
+   - proveedor_id
+   - nombre                       -> ej. "Limpieza total de oficina"
+   - personas_min, personas_max   -> ej. 6 a 8 personas
+   - m2_min, m2_max               -> rango de m² que cubre el paquete (ej. 80 a 150 m²)
+   - precio_mxn                   -> precio FIJO del paquete
+   - Paquete_Servicio (muchos a muchos): servicios de SU catálogo que
+     incluye (ej. ventanas + limpieza profunda).
+
+9. Contratación  -> necesaria para reseñas y reportes
+   - id
+   - cliente_id (usuario)
+   - proveedor_id
+   - servicio_id o paquete_id
+   - tipo_espacio_id
+   - m2                           -> metros cuadrados que indicó el cliente
+   - precio_mxn                   -> el cotizado al momento de contratar
+   - fecha
+   - estado (por definir: ej. solicitada, aceptada, terminada, cancelada)
+
+10. Reporte (levantado a un proveedor por su servicio)
+   - id
+   - proveedor_id
+   - cliente_id (autor)
+   - contratacion_id (opcional)   -> CUALQUIER usuario puede reportar, haya contratado o no
+   - motivo
+   - descripcion
+   - fecha
+   - estado: 'abierto' | 'en_revision' | 'resuelto'
+   - revisado_por (admin de plataforma, ver E "Administración")
+   Se muestran en el PERFIL del proveedor.
+   Los revisa el ADMIN DE PLATAFORMA (el equipo de CleanLink), no el proveedor.
+
+
+============================================================
+B. ENDPOINTS QUE YA USA EL FRONTEND (por ahora con datos de prueba)
+============================================================
+
+1. GET /api/providers
+   Pantalla: Resultados (frontend/src/components/results-view.tsx)
+   Parámetros (todos opcionales):
+     query      texto buscado
+     zone       zona (pendiente de decidir si se queda, ver C.3)
+     services   ids de servicio, separados por coma
+     minRating  calificación mínima (0 o 4.5)
+     verified   true = solo verificados
+     kind       'persona' | 'equipo' | 'empresa'
+     sort       'rating' (default) | 'requests' | 'price'
+     spaceType  id de tipo de espacio (tabla 6)          -> para cotizar
+     m2         metros cuadrados del cliente              -> para cotizar
+                Con m2: se excluyen proveedores con m2_max menor.
+                Con spaceType + m2 + services: cada proveedor trae su cotización.
+     page       número de página, empieza en 1 (default 1)
+     pageSize   resultados por página (default por definir, ej. 20)
+   Respuesta PAGINADA (el frontend muestra "página 2/26"):
+     {
+       "items": lista de proveedores (forma abajo),
+       "page": número de página actual,
+       "totalPages": total de páginas,
+       "total": total de resultados
+     }
+   Cada proveedor en "items":
+     {
+       "id": texto,
+       "name": texto,
+       "kind": "persona" | "equipo" | "empresa",
+       "teamSize": número entero (solo equipo y empresa; en persona se omite),
+       "zone": texto,
+       "rating": número con 1 decimal (0.0 a 5.0),
+       "reviews": número entero,
+       "verified": true | false,
+       "services": lista de TODOS los ids de servicio que ofrece (ver tabla 3),
+       "featuredServices": lista de 0 a 2 ids de servicio destacados,
+       "quote": total en MXN de la cotización automática para esta búsqueda,
+                o null si faltan spaceType, m2 o services,
+       "schedule": uno de estos tres:
+         { "mode": "siempre" }
+         { "mode": "sin-definir" }
+         { "mode": "definido",
+           "days": lista de "lun" | "mar" | "mie" | "jue" | "vie" | "sab" | "dom",
+           "from": hora "HH:MM",
+           "to": hora "HH:MM" }
+     }
+
+2. GET /api/providers/destacados
+   Pantalla: Feed, sección "Lo más destacado" (feed-view.tsx)
+   Proveedores con más movimiento (más solicitudes recientes).
+   Respuesta: lista de
+     {
+       "id": texto,
+       "name": texto,
+       "kind": "persona" | "equipo" | "empresa",
+       "rating": número entero de 0 a 5 (estrellas completas, ver C.1)
+     }
+
+3. GET /api/services
+   Catálogo de servicios (tabla 3). Hoy está fijo en frontend/src/data/services.ts.
+
+4. GET /api/zones
+   Catálogo de zonas. Hoy está fijo en frontend/src/data/services.ts.
+   Pendiente de decidir si se queda, ver C.3.
+
+
+============================================================
+C. PREGUNTAS ABIERTAS (decidir antes de construir)
+============================================================
+
+1. Calificación: en Resultados se muestra con decimal (4.9) y en
+   "Lo más destacado" en estrellas completas (0 a 5). ¿Backend manda
+   siempre el decimal y el frontend redondea, o son dos campos?
+2. "Lo más destacado": ¿qué cuenta como "más movimiento"? (solicitudes de
+   los últimos N días, reseñas recientes, ...)
+3. Zona: el proveedor solo registra ciudad y estado (sin colonia). ¿El filtro
+   de "Zona" de resultados pasa a ser filtro por CIUDAD?
+4. Filtros del feed: "Mejores calificaciones" y "Más solicitados" ordenan;
+   "Residencial" y "Comercial" filtran. Hoy son excluyentes (uno a la vez).
+5. Catálogo: ¿qué servicios PROPUESTOS y OPCIONALES se agregan? ¿Un servicio
+   puede ser residencial y comercial a la vez ("ambas")?
+
+
+
+============================================================
+D. PENDIENTE PARA DESPUÉS (aún sin pantalla)
+============================================================
+
+- Inicio de sesión y registro (regla 1: se pide al solicitar/contratar).
+- GET /api/me: datos del usuario con sesión (nombre, foto) para la navbar.
+- Notificaciones: contador de no leídas para el icono de la navbar.
+- Perfil de proveedor: GET /api/providers/{id} (aquí sí va la ubicación).
+- Publicar solicitud (requiere sesión y cuenta verificada, reglas 1 y 2).
+
+
+============================================================
+E. MULTI-TENENCIA (requisito del proyecto integrador)
+============================================================
+
+Qué es el tenant
+- Cada PROVEEDOR es un tenant: persona, equipo o empresa.
+- Todos usan la misma interfaz de gestión, pero cada uno solo ve, agrega,
+  edita y elimina SUS datos.
+- Tenant y Proveedor son lo mismo (una sola entidad, no se duplica).
+
+Cuentas
+- Cada tenant tiene UNA sola cuenta (un usuario). No hay roles ni varios
+  usuarios por tenant: quien tenga acceso a esa cuenta puede hacer todo.
+- Los CLIENTES son usuarios SIN tenant: tienen su propio perfil e historial
+  (aislamiento por usuario, no por tenant).
+- Tipo de cuenta: 'cliente' | 'proveedor' | 'admin'.
+  cliente y proveedor se eligen en el REGISTRO y no cambian.
+  admin = el equipo de CleanLink (no se registra desde la app; ver "Administración").
+  Una cuenta nunca es ambas: quien sea cliente y proveedor usa dos cuentas
+  (dos correos). Motivo: la cuenta de proveedor es compartida por su equipo,
+  y el historial personal de cliente no debe quedar a la vista de ellos.
+
+Estrategia
+- Una base de datos compartida; cada tabla PRIVADA del tenant lleva tenant_id.
+- El tenant se toma del token de sesión, NUNCA de lo que mande el cliente.
+- Reforzar con Row-Level Security de SQL Server (SESSION_CONTEXT con el
+  tenant_id del token), para que la base filtre aunque falte un WHERE.
+
+Datos PRIVADOS del tenant (llevan tenant_id, solo los ve su cuenta)
+- Servicios que ofrece y cuáles son destacados.
+- Horario de atención.
+- Cantidad de personas (número o rango; NO se guarda cada integrante).
+- Precios por variable (tabla 7) y paquetes (tabla 8): los EDITA solo el
+  tenant; el cliente solo ve el resultado de la cotización y los paquetes.
+- Solicitudes recibidas.
+- Métricas (por definir: ej. visitas al perfil, solicitudes, contrataciones).
+- Se agregarán más conforme salgan.
+
+Datos PÚBLICOS (escaparate: buscador, resultados y perfil público)
+- Lo que cada cuenta publica en su perfil:
+  - tipo: persona, equipo o empresa
+  - servicios (del catálogo) y destacados
+  - calificación (estrellas / rating)
+  - reseñas
+  - reportes levantados a su servicio
+  - ciudad y estado
+  - personas que trabajan (número o rango)
+  - presentación (texto)
+  - imágenes (opcional)
+  - paquetes predeterminados (opcional; ver tabla 8)
+- El catálogo de servicios es GLOBAL (lo comparten todos los tenants).
+- El escaparate lee datos de TODOS los tenants, solo lectura y solo lo
+  publicable. Usar una consulta o vista pública separada de la de gestión.
+- Feed: muestra "Lo más destacado" (más actividad). El resto se consulta
+  con filtros y llega PAGINADO (ver B.1).
+
+Reseñas
+- Las escribe un cliente sobre un tenant; lectura pública.
+- SOLO un cliente que contrató ese servicio puede dejar reseña.
+  -> Hace falta registrar contrataciones (cliente, tenant, servicio, fecha).
+- Solo su autor puede editarla.
+
+Alta de tenant (lo que se hace en vivo en la demo)
+- Datos de la cuenta: nombre, correo y contraseña.
+- Tipo de tenant: persona, equipo o empresa.
+- Servicios: se le muestra TODO el catálogo; elige todos los que ofrece y,
+  de ellos, sus 2 destacados.
+- Horario: siempre, definido (días y horas) o sin definir.
+- Personas: equipo -> número fijo; empresa -> mínimo y máximo.
+- Ubicación: ciudad y estado (sin colonia).
+- Precios: un precio en MXN para sus variables (servicio y tipo de espacio,
+  ver tabla 7 y pregunta C.7). Es lo que permite la cotización automática.
+- Paquetes (opcional): nombre, servicios incluidos, rango de personas y precio fijo.
+- Presentación e imágenes (opcional).
+- Al crearse queda SIN VERIFICAR (regla 2: no puede publicar).
+  - Real: se envía un correo de verificación con un enlace; al abrirlo,
+    la cuenta queda verificada.
+    -> Backend necesita un SERVICIO DE ENVÍO DE CORREO. La elección queda
+       a decisión de Ulises. Opciones sugeridas:
+       - Azure Communication Services (Email): ya usan Azure.
+       - SendGrid: tiene plan gratuito.
+       - SMTP con Nodemailer (ej. una cuenta de Gmail): lo más simple para pruebas.
+  - Demo: no se requiere verificar (no hace falta el servicio de correo).
+
+Autenticación
+- Contraseña guardada con hash (bcrypt).
+- Token de sesión (JWT) con userId, tenantId (si es proveedor) y tipo de cuenta.
+- La sesión dura 7 DÍAS; después se pide iniciar sesión otra vez.
+
+Administración (tercera parte: el equipo de CleanLink)
+- Rol ADMIN DE PLATAFORMA: no es tenant ni cliente; lo usa el equipo.
+- Revisa y cambia el estado de los REPORTES de TODOS los tenants.
+- Es el único acceso que cruza tenants, y SOLO para lo que necesita
+  (reportes). Debe quedar explícito en el código y en la política RLS
+  (ej. la política permite leer reportes si el tipo de cuenta es admin).
+- Sus cuentas se crean directo en la base (seed), no desde el registro.
+
+Pendientes de multi-tenencia
+- E.4 Qué datos del tenant se usan para demostrar el aislamiento en la demo
+  (se deja para el final).
