@@ -122,7 +122,7 @@ Código: [`verification.js`](../backend/src/verification.js), [`email.js`](../ba
 
 Preparación (una vez): `npm run db:setup` y `npm run db:seed` en `backend/`. Para repetir la demo desde cero: `npm run db:seed -- --reset` (borra los tenants que no son de la semilla).
 
-Cuentas de la semilla (contraseña en [`backend/scripts/seed.js`](../backend/scripts/seed.js)):
+Cuentas de la semilla (las 3 usan la contraseña de `SEED_PASSWORD` en `backend/.env`, que no se sube al repositorio):
 
 - Tenant A: `brillo.total@demo.cleanlink.mx` (empresa, verificado)
 - Tenant B: `cuadrilla.hernandez@demo.cleanlink.mx` (equipo, verificado)

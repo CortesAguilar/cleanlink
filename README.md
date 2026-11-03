@@ -142,6 +142,7 @@ JWT_SECRET=your_long_random_secret_here
 ACS_CONNECTION_STRING=
 MAIL_FROM=DoNotReply@your-domain.azurecomm.net
 APP_URL=http://localhost:5173
+SEED_PASSWORD=your_demo_password_here
 ```
 
 `JWT_SECRET` firma los tokens de sesión; genera uno propio, por ejemplo con `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`.
@@ -161,6 +162,8 @@ npm run db:setup   # crea la BD cleanlink (si no existe) y aplica las migracione
 npm run db:seed    # 2 tenants de demo y una cuenta de admin de plataforma
 node index.js
 ```
+
+`SEED_PASSWORD` es la contraseña de las 3 cuentas de demo (mínimo 12 caracteres); la semilla no corre sin ella y en cada ejecución la vuelve a aplicar.
 
 Ambos comandos se pueden repetir sin problema. `npm run db:seed -- --reset` además borra los tenants que no son de la semilla (para repetir la demo).
 

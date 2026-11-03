@@ -6,13 +6,18 @@
 //   npm run db:seed -- --reset   además elimina los tenants que NO son de la semilla
 //                                (p. ej. el que se da de alta en vivo), para repetir la demo
 //
-// Contraseña de las cuentas de demo: SEED_PASSWORD o, si no está definida, la de abajo.
+// Contraseña de las cuentas de demo: SEED_PASSWORD (obligatoria, va en backend/.env y
+// nunca en el repositorio). Cada ejecución la vuelve a poner en las 3 cuentas.
 require('dotenv').config({ quiet: true });
 const { sql, getPool } = require('../src/db');
 const { hashPassword } = require('../src/auth');
 const { validateNewTenant, createTenant } = require('../src/tenants');
 
 const PASSWORD = process.env.SEED_PASSWORD;
+if (!PASSWORD || PASSWORD.length < 12) {
+  console.error('Define SEED_PASSWORD (mínimo 12 caracteres) en backend/.env antes de correr la semilla.');
+  process.exit(1);
+}
 
 const TENANTS = [
   {
@@ -100,6 +105,14 @@ async function main() {
               VALUES (@nombre, @correo, @hash, 'admin', 1)`);
     console.log(`Creado: admin de plataforma (${ADMIN.email})`);
   }
+
+  // Las 3 cuentas de la semilla quedan con la contraseña actual de SEED_PASSWORD.
+  await pool
+    .request()
+    .input('correos', sql.NVarChar(sql.MAX), [...TENANTS.map((t) => t.email), ADMIN.email].join(','))
+    .input('hash', sql.VarChar(100), await hashPassword(PASSWORD))
+    .query(`UPDATE core.Usuario SET password_hash = @hash
+            WHERE correo IN (SELECT value FROM STRING_SPLIT(@correos, ','))`);
 
   // Las cuentas de la semilla quedan verificadas; un tenant dado de alta en
   // vivo aparece "Sin verificar" hasta que abre el enlace del correo.
