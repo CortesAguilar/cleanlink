@@ -1,7 +1,8 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const cors = require('cors');
 const sql = require('mssql');
+const { router, errorHandler } = require('./src/routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +36,14 @@ app.get('/api/db-health', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`CleanLink API escuchando en el puerto ${PORT}`);
-});
+app.use('/api', router);
+app.use(errorHandler);
+
+// Las pruebas importan la app sin levantar el servidor.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`CleanLink API escuchando en el puerto ${PORT}`);
+  });
+}
+
+module.exports = app;

@@ -136,24 +136,51 @@ DB_SERVER=localhost
 DB_PORT=1433
 DB_USER=sa
 DB_PASSWORD=your_secure_password_here
-DB_NAME=master
+DB_NAME=cleanlink
 DB_TRUST_CERT=true
+JWT_SECRET=your_long_random_secret_here
+ACS_CONNECTION_STRING=
+MAIL_FROM=DoNotReply@your-domain.azurecomm.net
+APP_URL=http://localhost:5173
+SEED_PASSWORD=your_demo_password_here
 ```
 
-Instalar dependencias y arrancar la API:
+`JWT_SECRET` firma los tokens de sesión; genera uno propio, por ejemplo con `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`.
+
+`ACS_CONNECTION_STRING` y `MAIL_FROM` son del servicio de correo (Azure Communication Services, recurso `acs-cleanlink` con el dominio administrado de `ecs-cleanlink`). Si `ACS_CONNECTION_STRING` está vacío, el enlace de verificación se imprime en la consola de la API en lugar de enviarse. `APP_URL` es la dirección del frontend que va en el enlace del correo.
+
+```powershell
+az communication list-key --name acs-cleanlink --resource-group rg-cleanlink --query primaryConnectionString -o tsv
+```
+
+Instalar dependencias, preparar la base de datos y arrancar la API:
 
 ```powershell
 cd backend
 npm install
+npm run db:setup   # crea la BD cleanlink (si no existe) y aplica las migraciones
+npm run db:seed    # 2 tenants de demo y una cuenta de admin de plataforma
 node index.js
 ```
+
+`SEED_PASSWORD` es la contraseña de las 3 cuentas de demo (mínimo 12 caracteres); la semilla no corre sin ella y en cada ejecución la vuelve a aplicar.
+
+Ambos comandos se pueden repetir sin problema. `npm run db:seed -- --reset` además borra los tenants que no son de la semilla (para repetir la demo).
 
 Verificar los endpoints en el navegador:
 
 | Endpoint | Respuesta esperada |
 |---|---|
 | `http://localhost:3000/api/health` | `{"status":"ok","app":"CleanLink API"}` |
-| `http://localhost:3000/api/db-health` | `{"status":"ok","database":"connected","name":"master"}` |
+| `http://localhost:3000/api/db-health` | `{"status":"ok","database":"connected","name":"cleanlink"}` |
+
+Prueba de aislamiento entre tenants (requiere el contenedor de SQL Server activo):
+
+```powershell
+npm test
+```
+
+La estrategia de multi-tenencia y el guion de la demo están en [docs/multitenencia.md](docs/multitenencia.md).
 
 ### Frontend (React + Vite)
 
