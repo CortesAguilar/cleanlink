@@ -300,13 +300,17 @@ Cuentas
   (dos correos). Motivo: la cuenta de proveedor es compartida por su equipo,
   y el historial personal de cliente no debe quedar a la vista de ellos.
 
-Estrategia
-- Una base de datos compartida; cada tabla PRIVADA del tenant lleva tenant_id.
+Estrategia (IMPLEMENTADA; detalle en docs/multitenencia.md)
+- Una base de datos compartida con UN ESQUEMA POR TENANT (tnt_<nombre>).
+  Lo compartido (cuentas, registro de tenants, catálogos) vive en el esquema core.
+- Cada tenant tiene su propio usuario de BD (usr_<nombre>, sin login) con
+  permisos SOLO sobre su esquema. La API consulta con EXECUTE AS ese usuario:
+  si una consulta apuntara a otro tenant, SQL Server responde permiso denegado.
 - El tenant se toma del token de sesión, NUNCA de lo que mande el cliente.
-- Reforzar con Row-Level Security de SQL Server (SESSION_CONTEXT con el
-  tenant_id del token), para que la base filtre aunque falte un WHERE.
+- (Antes se planeaba tenant_id + Row-Level Security; se cambió a esquemas,
+  como dice el manual técnico.)
 
-Datos PRIVADOS del tenant (llevan tenant_id, solo los ve su cuenta)
+Datos PRIVADOS del tenant (viven en su esquema, solo los ve su cuenta)
 - Servicios que ofrece y cuáles son destacados.
 - Horario de atención.
 - Cantidad de personas (número o rango; NO se guarda cada integrante).
