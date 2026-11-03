@@ -12,8 +12,9 @@ async function createDatabase(name) {
   // puede crear desde master con el mismo usuario; solo se crea en local.
   const pool = await new sql.ConnectionPool(config('master')).connect();
   try {
-    const exists = await pool.request().input('name', sql.NVarChar, name).query('SELECT DB_ID(@name) AS id');
-    if (exists.recordset[0].id === null) {
+    // sys.databases (no DB_ID): en Azure SQL, DB_ID desde master no ve las demás bases.
+    const exists = await pool.request().input('name', sql.NVarChar, name).query('SELECT 1 AS x FROM sys.databases WHERE name = @name');
+    if (exists.recordset.length === 0) {
       if (!/^[A-Za-z0-9_]+$/.test(name)) throw new Error(`Nombre de base de datos inválido: ${name}`);
       await pool.request().batch(`CREATE DATABASE [${name}]`);
       console.log(`Base de datos ${name} creada.`);
