@@ -1,7 +1,8 @@
 const express = require('express');
 const { sql, getPool } = require('./db');
-const { hashPassword, checkPassword, signToken, requireAuth, requireTenant } = require('./auth');
+const { hashPassword, checkPassword, signToken, requireAuth, requireTenant, requireAdmin } = require('./auth');
 const tenants = require('./tenants');
+const { sendVerification, resendWait, verifyToken } = require('./verification');
 
 const router = express.Router();
 
@@ -29,20 +30,24 @@ router.get('/space-types', async (req, res) => {
 
 router.post('/tenants', async (req, res) => {
   const data = await tenants.validateNewTenant(req.body ?? {});
+  let created;
   try {
-    const created = await tenants.createTenant(data, await hashPassword(data.password));
-    const user = { id: created.userId, tipoCuenta: 'proveedor', tenantId: created.tenantId };
-    res.status(201).json({
-      token: signToken(user),
-      user: { id: user.id, name: data.name, email: data.email, accountType: 'proveedor', tenantId: created.tenantId },
-      tenant: { id: created.tenantId, schema: created.schema },
-    });
+    created = await tenants.createTenant(data, await hashPassword(data.password));
   } catch (err) {
     if (err.number === 2627 || err.number === 2601) {
       return res.status(409).json({ error: 'Ya existe una cuenta con ese correo', errors: { email: 'Ya existe una cuenta con ese correo' } });
     }
     throw err;
   }
+  // La cuenta ya existe; si el correo no sale, se puede reenviar desde la vista de gestión.
+  const emailSent = await sendVerification({ id: created.userId, email: data.email, name: data.name });
+  const user = { id: created.userId, tipoCuenta: 'proveedor', tenantId: created.tenantId };
+  res.status(201).json({
+    token: signToken(user),
+    user: { id: user.id, name: data.name, email: data.email, accountType: 'proveedor', tenantId: created.tenantId },
+    tenant: { id: created.tenantId, schema: created.schema },
+    emailSent,
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -111,6 +116,62 @@ router.get('/me', requireAuth, async (req, res) => {
     WHERE u.id = @id`);
   if (!result.recordset[0]) return res.status(401).json({ error: 'La cuenta ya no existe' });
   res.json(publicUser(result.recordset[0]));
+});
+
+// ---------------------------------------------------------------------------
+// Verificación de correo
+// ---------------------------------------------------------------------------
+
+// Se abre desde el enlace del correo (no requiere sesión: el token es la prueba).
+router.post('/auth/verify-email', async (req, res) => {
+  const usuarioId = await verifyToken(req.body?.token);
+  if (!usuarioId) return res.status(400).json({ error: 'El enlace no es válido o ya venció. Pide uno nuevo desde tu cuenta.' });
+  res.json({ verified: true });
+});
+
+router.post('/auth/resend-verification', requireAuth, async (req, res) => {
+  const pool = await getPool();
+  const row = (
+    await pool.request().input('id', sql.Int, req.session.userId).query('SELECT id, nombre, correo, verificado FROM core.Usuario WHERE id = @id')
+  ).recordset[0];
+  if (!row) return res.status(401).json({ error: 'La cuenta ya no existe' });
+  if (row.verificado) return res.json({ verified: true, emailSent: false });
+
+  const wait = await resendWait(row.id);
+  if (wait > 0) return res.status(429).json({ error: `Espera ${wait} segundos para pedir otro correo` });
+  const emailSent = await sendVerification({ id: row.id, email: row.correo, name: row.nombre });
+  res.json({ verified: false, emailSent });
+});
+
+// ---------------------------------------------------------------------------
+// Admin de plataforma. Es el único acceso que cruza tenants y solo ve el
+// registro de tenants (esquema core): nunca lee los esquemas tnt_*.
+// ---------------------------------------------------------------------------
+
+router.get('/admin/tenants', requireAuth, requireAdmin, async (req, res) => {
+  const pool = await getPool();
+  const result = await pool.request().query(`
+    SELECT t.id, t.nombre, t.tipo, t.ciudad, t.estado, t.verificado, t.fecha_creacion,
+           t.schema_name, t.db_user, u.correo,
+           -- Metadato del catálogo de SQL Server, no datos del tenant.
+           (SELECT COUNT(*) FROM sys.tables st WHERE st.schema_id = SCHEMA_ID(t.schema_name)) AS tablas
+    FROM core.Tenant t JOIN core.Usuario u ON u.id = t.usuario_id
+    ORDER BY t.fecha_creacion DESC, t.id DESC`);
+  res.json(
+    result.recordset.map((t) => ({
+      id: t.id,
+      name: t.nombre,
+      kind: t.tipo,
+      city: t.ciudad,
+      state: t.estado,
+      email: t.correo,
+      verified: t.verificado,
+      createdAt: t.fecha_creacion,
+      schema: t.schema_name,
+      dbUser: t.db_user,
+      tables: t.tablas,
+    })),
+  );
 });
 
 // ---------------------------------------------------------------------------

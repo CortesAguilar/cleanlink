@@ -90,3 +90,19 @@ export type AuthResponse = {
   token: string;
   user: SessionUser;
 };
+
+/** Tenant en el panel del admin de plataforma. Contrato de GET /api/admin/tenants. */
+export type AdminTenant = {
+  id: number;
+  name: string;
+  kind: ProviderKind;
+  city: string;
+  state: string;
+  email: string;
+  verified: boolean;
+  createdAt: string;
+  schema: string;
+  dbUser: string;
+  /** Tablas en su esquema (metadato de SQL Server, no datos del tenant). */
+  tables: number;
+};

@@ -2,6 +2,8 @@
 // Requiere SQL Server con las migraciones aplicadas (npm run db:setup).
 // Uso: npm test
 require('dotenv').config({ quiet: true });
+// En las pruebas no se envían correos reales: el enlace se imprime en la consola.
+process.env.ACS_CONNECTION_STRING = ''; // dotenv no sobrescribe variables ya definidas
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');

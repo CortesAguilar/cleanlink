@@ -101,6 +101,16 @@ async function main() {
     console.log(`Creado: admin de plataforma (${ADMIN.email})`);
   }
 
+  // Las cuentas de la semilla quedan verificadas; un tenant dado de alta en
+  // vivo aparece "Sin verificar" hasta que abre el enlace del correo.
+  const seededEmails = TENANTS.map((t) => t.email).join(',');
+  await pool.request().input('correos', sql.NVarChar(sql.MAX), seededEmails).query(`
+    UPDATE u SET verificado = 1
+    FROM core.Usuario u WHERE u.correo IN (SELECT value FROM STRING_SPLIT(@correos, ','));
+    UPDATE t SET verificado = 1
+    FROM core.Tenant t JOIN core.Usuario u ON u.id = t.usuario_id
+    WHERE u.correo IN (SELECT value FROM STRING_SPLIT(@correos, ','));`);
+
   await pool.close();
 }
 

@@ -139,9 +139,18 @@ DB_PASSWORD=your_secure_password_here
 DB_NAME=cleanlink
 DB_TRUST_CERT=true
 JWT_SECRET=your_long_random_secret_here
+ACS_CONNECTION_STRING=
+MAIL_FROM=DoNotReply@your-domain.azurecomm.net
+APP_URL=http://localhost:5173
 ```
 
 `JWT_SECRET` firma los tokens de sesión; genera uno propio, por ejemplo con `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`.
+
+`ACS_CONNECTION_STRING` y `MAIL_FROM` son del servicio de correo (Azure Communication Services, recurso `acs-cleanlink` con el dominio administrado de `ecs-cleanlink`). Si `ACS_CONNECTION_STRING` está vacío, el enlace de verificación se imprime en la consola de la API en lugar de enviarse. `APP_URL` es la dirección del frontend que va en el enlace del correo.
+
+```powershell
+az communication list-key --name acs-cleanlink --resource-group rg-cleanlink --query primaryConnectionString -o tsv
+```
 
 Instalar dependencias, preparar la base de datos y arrancar la API:
 

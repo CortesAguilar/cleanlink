@@ -65,4 +65,20 @@ async function requireTenant(req, res, next) {
   }
 }
 
-module.exports = { hashPassword, checkPassword, signToken, requireAuth, requireTenant };
+/** Exige sesión de admin de plataforma, confirmada en la base (no solo en el token). */
+async function requireAdmin(req, res, next) {
+  if (req.session?.tipoCuenta !== 'admin') return res.status(403).json({ error: 'Solo el admin de plataforma puede ver esto' });
+  try {
+    const pool = await getPool();
+    const result = await pool
+      .request()
+      .input('id', sql.Int, req.session.userId)
+      .query("SELECT 1 AS ok FROM core.Usuario WHERE id = @id AND tipo_cuenta = 'admin'");
+    if (!result.recordset[0]) return res.status(403).json({ error: 'Solo el admin de plataforma puede ver esto' });
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { hashPassword, checkPassword, signToken, requireAuth, requireTenant, requireAdmin };

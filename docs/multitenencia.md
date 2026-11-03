@@ -80,9 +80,33 @@ La API usa un pool de conexiones compartido. Las pruebas automatizadas detectaro
 
 Los identificadores (`tnt_*`, `usr_*`) los genera el servidor a partir del nombre (sin acentos ni símbolos), se validan con una restricción `CHECK` y una expresión regular, y se usan con `QUOTENAME`.
 
-## Prueba de aislamiento automatizada
+## Admin de plataforma (equipo de CleanLink)
 
-[`backend/test/aislamiento.test.js`](../backend/test/aislamiento.test.js) (`npm test` en `backend/`) crea dos tenants temporales y comprueba que:
+Es el **único acceso que cruza tenants**, y con el mínimo necesario:
+
+- Entra con una cuenta `tipo_cuenta = 'admin'` creada directo en la base (semilla), nunca desde el registro.
+- `GET /api/admin/tenants` exige sesión de admin, confirmada en `core.Usuario` (`requireAdmin` en [`auth.js`](../backend/src/auth.js)).
+- Ve el **registro de tenants** de `core`: nombre, tipo, ubicación, correo, si está verificado, fecha de alta, su esquema y su usuario de BD (y cuántas tablas tiene el esquema, un metadato de SQL Server).
+- **No** ve los datos privados: la consulta no usa `EXECUTE AS` ni toca ningún `tnt_*`, y el admin no puede usar `/api/tenant` (403).
+
+Pantalla: `/admin` ([`admin-view.tsx`](../frontend/src/components/admin-view.tsx)).
+
+## Verificación de correo
+
+Al dar de alta un tenant se envía un correo de confirmación con **Azure Communication Services Email** (dominio administrado por Azure, remitente `DoNotReply@…azurecomm.net`):
+
+1. `POST /api/tenants` crea el tenant (queda **Sin verificar**) y genera un token aleatorio de 32 bytes. En `core.VerificacionCorreo` solo se guarda su **hash SHA-256**; vence en 24 h y sirve una sola vez.
+2. El correo trae el enlace `APP_URL/verificar?token=…`. La página llama a `POST /api/auth/verify-email`, que marca el token como usado y pone `verificado = 1` en la cuenta y en el tenant.
+3. Mientras no verifique, el proveedor **sí entra** a su vista, pero ve el aviso "Confirma tu correo" (no puede publicar) y puede **reenviar** el correo (máximo uno por minuto).
+4. Si el envío falla, el alta no falla: se puede reenviar desde la vista. Sin `ACS_CONNECTION_STRING` (desarrollo) el enlace se imprime en la consola de la API.
+
+Código: [`verification.js`](../backend/src/verification.js), [`email.js`](../backend/src/email.js).
+
+## Pruebas automatizadas
+
+`npm test` en `backend/` corre dos archivos.
+
+[`backend/test/aislamiento.test.js`](../backend/test/aislamiento.test.js) crea dos tenants temporales y comprueba que:
 
 1. Cada alta crea un esquema y un usuario de BD distintos.
 2. Cada tenant ve solo sus datos y SQL Server responde con su identidad.
@@ -92,27 +116,31 @@ Los identificadores (`tnt_*`, `usr_*`) los genera el servidor a partir del nombr
 6. Tras errores, todas las conexiones del pool vuelven a la identidad de la aplicación.
 7. Sin token, con token alterado, con token de otra cuenta o con cuenta de cliente → 401/403.
 
+[`backend/test/admin-verificacion.test.js`](../backend/test/admin-verificacion.test.js) comprueba que solo el admin ve la lista de tenants (401/403 para los demás), que el admin no entra a los datos privados de un tenant, que un enlace inventado no verifica, que el reenvío respeta el minuto de espera y que un enlace válido verifica la cuenta y el tenant una sola vez.
+
 ## Guion de la demo
 
 Preparación (una vez): `npm run db:setup` y `npm run db:seed` en `backend/`. Para repetir la demo desde cero: `npm run db:seed -- --reset` (borra los tenants que no son de la semilla).
 
 Cuentas de la semilla (contraseña en [`backend/scripts/seed.js`](../backend/scripts/seed.js)):
 
-- Tenant A: `brillo.total@demo.cleanlink.mx` (empresa)
-- Tenant B: `cuadrilla.hernandez@demo.cleanlink.mx` (equipo)
+- Tenant A: `brillo.total@demo.cleanlink.mx` (empresa, verificado)
+- Tenant B: `cuadrilla.hernandez@demo.cleanlink.mx` (equipo, verificado)
+- Admin de plataforma: `admin@demo.cleanlink.mx`
 
 1. **Tenant A**: `/login` → `/mi-negocio`. Mostrar sus servicios y el recuadro "Tu espacio en la base de datos" (esquema `tnt_brillo_total`, SQL Server respondió como `usr_brillo_total`).
 2. **Tenant B**: cerrar sesión, entrar con B → datos distintos, esquema `tnt_cuadrilla_hernandez`.
-3. **Alta en vivo del tenant C**: `/registro/proveedor` → llenar el formulario → entra directo a su vista con su esquema nuevo. Agregarle un servicio o cambiar un precio y guardar.
-4. **Intento de cruzar tenants**:
+3. **Admin**: entrar con el admin → `/admin` lista A y B con su esquema y usuario de BD. Explicar que ve el registro, no los datos privados.
+4. **Alta en vivo del tenant C** (puede hacerla el profesor con su correo): "Crear cuenta" → `/registro/proveedor` → llenar → entra a su vista **Sin verificar**, con el aviso. Le llega el correo de Azure (revisar spam) → "Confirmar mi correo" → `/verificar` → la vista pasa a **Verificado**. En `/admin` aparece C con su esquema nuevo. Agregarle un servicio o cambiar un precio y guardar.
+5. **Intento de cruzar tenants**:
    - API: con la sesión de C, pedir `GET /api/tenant?tenantId=<id de A>` → responde con C.
    - BD: correr [`backend/database/demo/aislamiento.sql`](../backend/database/demo/aislamiento.sql) → esquemas y permisos de cada tenant, y **error 229** al leer el esquema de otro.
-   - `npm test` → las 7 pruebas de aislamiento en verde.
-5. **Código**: `sp_crear_tenant` (alta y permisos), `tenantDb` en `db.js` (EXECUTE AS), `requireTenant` en `auth.js` (tenant desde el token).
+   - `npm test` → las 14 pruebas en verde.
+6. **Código**: `sp_crear_tenant` (alta y permisos), `tenantDb` en `db.js` (EXECUTE AS), `requireTenant` / `requireAdmin` en `auth.js` (tenant desde el token, admin con acceso mínimo), `verification.js` (token con hash).
 
 ## Pendiente / evolución
 
 - **Cambios de tablas**: `core.sp_aplicar_plantilla_tenant` es idempotente; una migración nueva agrega la tabla a la plantilla y la ejecuta para cada tenant de `core.Tenant`.
 - **Escaparate público** (búsqueda y perfiles): leerá lo publicable de todos los tenants desde una vista o tabla en `core`, de solo lectura, sin dar a nadie permisos sobre los esquemas de tenant.
-- **Admin de plataforma**: los reportes vivirán en `core` con permisos solo para el admin.
+- **Admin de plataforma**: los reportes vivirán en `core` y se agregarán a su panel, con permisos solo para el admin.
 - **Mínimo privilegio de la app**: hoy la API se conecta como `sa` (local) / admin del servidor (Azure). Lo ideal es un usuario propio con permisos sobre `core`, `IMPERSONATE` sobre los `usr_*` y permiso para crear esquemas.

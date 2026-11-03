@@ -26,6 +26,7 @@ import { SpaceAdjustmentsField } from './space-adjustments-field';
 import { TeamSizeField } from './team-size-field';
 import { TextArea } from './text-area';
 import { TextField } from './text-field';
+import { VerifyEmailBanner } from './verify-email-banner';
 
 type SaveState = { saving: boolean; message?: string; error?: string; errors?: Record<string, string> };
 
@@ -227,7 +228,13 @@ export function TenantDashboardView() {
                 <h1 className="text-title">{tenant.name}</h1>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone={tenant.kind === 'persona' ? 'persona' : 'grupo'}>{providerKindLabels[tenant.kind]}</Badge>
-                  {!tenant.verified && <Badge tone="warning">Sin verificar</Badge>}
+                  {tenant.verified ? (
+                    <Badge tone="success" icon="verified">
+                      Verificado
+                    </Badge>
+                  ) : (
+                    <Badge tone="warning">Sin verificar</Badge>
+                  )}
                   <span className="text-body-sm text-ink-muted">
                     {teamLabel(tenant)} · {tenant.city}, {tenant.state} · {formatSchedule(tenant.schedule)}
                   </span>
@@ -238,6 +245,8 @@ export function TenantDashboardView() {
                 Cerrar sesión
               </Button>
             </header>
+
+            {!tenant.verified && <VerifyEmailBanner email={tenant.email} />}
 
             <Card tone="tint" padding="md" aria-labelledby="aislamiento">
               <div className="flex items-center gap-2">
