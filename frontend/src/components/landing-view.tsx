@@ -14,7 +14,7 @@ const links = [
 export function LandingView() {
   return (
     <div className="min-h-svh">
-      <PublicNavbar links={links} loginHref="#" signupHref="#" />
+      <PublicNavbar links={links} loginHref="/login" signupHref="/registro/proveedor" />
       <main>
         {/* TODO: llevar la búsqueda a la vista Explorar cuando exista. */}
         <LandingHero />
