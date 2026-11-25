@@ -1,27 +1,39 @@
 import { providerKindLabels } from '../data/provider-kinds';
+import { services } from '../data/services';
 import type { ProviderSummary } from '../types/provider';
 import { Avatar } from './avatar';
-import { Badge } from './badge';
-import { StarRating } from './star-rating';
+import { Card } from './card';
+import { Rating } from './rating';
 
 type SuggestionCardProps = {
   provider: ProviderSummary;
+  /** A dónde lleva la tarjeta (el perfil del proveedor). */
+  href: string;
 };
 
-/** Proveedor sugerido: nombre, si es persona, equipo o empresa, y calificación en estrellas. */
-export function SuggestionCard({ provider }: SuggestionCardProps) {
-  const isGroup = provider.kind !== 'persona';
+/**
+ * Proveedor sugerido (Lo más destacado). Nombre y, en una línea: Persona/Equipo/Empresa,
+ * su servicio destacado y la calificación (una estrella + número, como en resultados).
+ * Toda la tarjeta es enlace al perfil.
+ */
+export function SuggestionCard({ provider, href }: SuggestionCardProps) {
+  const service = services.find((s) => s.id === provider.featuredService);
 
   return (
-    <article className="flex items-center gap-4 rounded-lg border border-line bg-surface-raised p-4 shadow-sm">
-      <Avatar name={provider.name} isGroup={isGroup} />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3 className="truncate text-body font-semibold">{provider.name}</h3>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <Badge tone={isGroup ? 'grupo' : 'persona'}>{providerKindLabels[provider.kind]}</Badge>
-          <StarRating value={provider.rating} />
+    <Card as="a" href={href} padding="sm">
+      <div className="flex items-center gap-4">
+        <Avatar name={provider.name} isGroup={provider.kind !== 'persona'} />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h3 className="truncate text-body font-semibold">{provider.name}</h3>
+          <div className="flex items-center gap-3">
+            <span className="min-w-0 flex-1 truncate text-body-sm text-ink-muted">
+              {providerKindLabels[provider.kind]}
+              {service && ` · ${service.label}`}
+            </span>
+            <Rating value={provider.rating} />
+          </div>
         </div>
       </div>
-    </article>
+    </Card>
   );
 }

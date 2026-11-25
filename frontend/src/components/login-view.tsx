@@ -38,7 +38,7 @@ export function LoginView() {
           <h1 className="text-title">Iniciar sesión</h1>
           <p className="text-body-sm text-ink-muted">Entra con el correo de tu cuenta de CleanLink.</p>
         </div>
-        <Card as="section" padding="lg" elevation="raised">
+        <Card as="section" padding="lg">
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <TextField
               label="Correo"

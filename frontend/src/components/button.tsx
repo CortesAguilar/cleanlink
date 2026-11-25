@@ -21,12 +21,12 @@ type ButtonAsLink = ButtonBaseProps &
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-md border border-transparent text-label whitespace-nowrap no-underline cursor-pointer transition disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 rounded-md border border-transparent text-label whitespace-nowrap no-underline cursor-pointer transition disabled:cursor-not-allowed disabled:border-line disabled:bg-line disabled:text-ink-muted';
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-on-primary enabled:hover:shadow-md',
-  secondary: 'bg-secondary text-on-secondary enabled:hover:shadow-md',
-  outline: 'bg-surface-raised border-primary text-primary enabled:hover:bg-primary-soft',
+  primary: 'bg-primary text-on-primary enabled:hover:brightness-95',
+  secondary: 'bg-secondary text-on-secondary enabled:hover:brightness-95',
+  outline: 'bg-surface-raised border-primary text-primary enabled:hover:bg-surface-tint',
   ghost: 'bg-transparent text-ink enabled:hover:bg-surface-tint',
 };
 

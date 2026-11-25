@@ -238,7 +238,8 @@ B. ENDPOINTS QUE YA USA EL FRONTEND (por ahora con datos de prueba)
        "id": texto,
        "name": texto,
        "kind": "persona" | "equipo" | "empresa",
-       "rating": número entero de 0 a 5 (estrellas completas, ver C.1)
+       "rating": número con un decimal (promedio de reseñas, igual que en GET /api/providers),
+       "featuredService": id del primer servicio destacado, o null si no tiene
      }
 
 3. GET /api/services
@@ -248,14 +249,41 @@ B. ENDPOINTS QUE YA USA EL FRONTEND (por ahora con datos de prueba)
    Catálogo de zonas. Hoy está fijo en frontend/src/data/services.ts.
    Pendiente de decidir si se queda, ver C.3.
 
+5. GET /api/notifications
+   Pantalla: campana de la navbar (app-navbar.tsx), cliente y proveedor.
+   Hoy son datos de prueba en frontend/src/data/notifications.ts.
+   Respuesta: lista, la más reciente primero, de
+     {
+       "id": texto,
+       "kind": "solicitud" | "recordatorio" | "calificacion" | "oferta",
+       "title": texto,
+       "body": texto,
+       "createdAt": fecha y hora ISO,
+       "href": texto (ruta del frontend a la que lleva, ej. "/panel/servicio?id=..."),
+       "read": booleano
+     }
+   Qué genera cada una:
+     proveedor: solicitud nueva por aceptar, recordatorio el día antes del
+                servicio, calificación recibida.
+     cliente:   el proveedor aceptó o finalizó su solicitud, recordatorio si
+                sigue pendiente, ofertas de proveedores que ya contrató.
+
+6. PUT /api/notifications/read
+   Cuerpo: { "ids": lista de texto }. Marca como leídas. Hoy se guarda en el
+   navegador (localStorage).
+
+7. GET /api/requests/{id} (cliente) y GET /api/tenant/requests/{id} (proveedor)
+   Pantalla: detalle del servicio (service-detail-view.tsx).
+   Respuesta: el mismo objeto ServiceRequest de las listas
+   (ver frontend/src/data/service-requests.ts). 404 si no es suyo.
+
 
 ============================================================
 C. PREGUNTAS ABIERTAS (decidir antes de construir)
 ============================================================
 
-1. Calificación: en Resultados se muestra con decimal (4.9) y en
-   "Lo más destacado" en estrellas completas (0 a 5). ¿Backend manda
-   siempre el decimal y el frontend redondea, o son dos campos?
+1. (Resuelta) Calificación: Resultados y "Lo más destacado" usan el mismo
+   promedio con un decimal (4.9).
 2. "Lo más destacado": ¿qué cuenta como "más movimiento"? (solicitudes de
    los últimos N días, reseñas recientes, ...)
 3. Zona: el proveedor solo registra ciudad y estado (sin colonia). ¿El filtro
@@ -273,7 +301,6 @@ D. PENDIENTE PARA DESPUÉS (aún sin pantalla)
 
 - Inicio de sesión y registro (regla 1: se pide al solicitar/contratar).
 - GET /api/me: datos del usuario con sesión (nombre, foto) para la navbar.
-- Notificaciones: contador de no leídas para el icono de la navbar.
 - Perfil de proveedor: GET /api/providers/{id} (aquí sí va la ubicación).
 - Publicar solicitud (requiere sesión y cuenta verificada, reglas 1 y 2).
 

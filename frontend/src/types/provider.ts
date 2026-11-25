@@ -44,5 +44,8 @@ export type ProviderSummary = {
   id: string;
   name: string;
   kind: ProviderKind;
-  rating: StarValue;
+  /** Promedio de reseñas, con un decimal (ej. 4.9), igual que en resultados. */
+  rating: number;
+  /** El primero de sus servicios destacados; null si no tiene. */
+  featuredService: ServiceId | null;
 };

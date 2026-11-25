@@ -33,7 +33,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
     <form
       role="search"
       onSubmit={handleSubmit}
-      className="flex flex-wrap gap-2 rounded-lg border border-line bg-surface-raised p-2 shadow-md"
+      className="flex flex-wrap gap-2 rounded-lg border border-line bg-surface-raised p-2"
     >
       <label className="flex min-h-12 flex-[2_1_200px] items-center gap-2 px-3">
         <Icon name="search" className="text-ink-muted" />

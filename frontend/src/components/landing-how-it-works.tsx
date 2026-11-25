@@ -65,7 +65,7 @@ const tracks: Track[] = [
 
 function TrackCard({ track }: { track: Track }) {
   return (
-    <Card padding="lg" elevation="raised" className="min-w-0 flex-[1_1_420px] gap-6">
+    <Card padding="lg" className="min-w-0 flex-[1_1_420px] gap-6">
       <div className="flex items-center gap-3">
         <span className="flex size-12 items-center justify-center rounded-md bg-primary text-on-primary">
           <Icon name={track.icon} size={24} />
@@ -83,7 +83,7 @@ function TrackCard({ track }: { track: Track }) {
             <li key={step.title} className="flex gap-4">
               {/* Número del paso con una línea que lo une al siguiente */}
               <div className="flex flex-col items-center">
-                <span className="flex size-10 flex-none items-center justify-center rounded-full bg-primary-soft text-label text-on-primary-soft">
+                <span className="flex size-10 flex-none items-center justify-center rounded-md bg-primary-soft text-label text-on-primary-soft">
                   {index + 1}
                 </span>
                 {!isLast && <span aria-hidden="true" className="w-0.5 flex-1 bg-line" />}

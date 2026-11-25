@@ -15,7 +15,7 @@ const dateFormat = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeS
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <Card padding="md" elevation="raised" className="gap-1">
+    <Card padding="md" className="gap-1">
       <span className="text-caption text-ink-muted">{label}</span>
       <span className="text-title">{value}</span>
     </Card>
@@ -96,7 +96,7 @@ export function AdminView() {
               ))}
             </section>
 
-            <Card as="section" padding="sm" elevation="raised" aria-labelledby="tenants" className="gap-2">
+            <Card as="section" padding="sm" aria-labelledby="tenants" className="gap-2">
               <h2 id="tenants" className="px-2 pt-2 text-heading">
                 Tenants registrados
               </h2>

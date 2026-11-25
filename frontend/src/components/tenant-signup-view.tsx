@@ -32,7 +32,7 @@ const kinds: ProviderKind[] = ['persona', 'equipo', 'empresa'];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card as="section" padding="lg" elevation="raised">
+    <Card as="section" padding="lg">
       <h2 className="text-heading">{title}</h2>
       {children}
     </Card>

@@ -40,7 +40,7 @@ export function VerifyEmailView() {
     <div className="min-h-svh">
       <PublicNavbar links={links} loginHref="/login" signupHref="/registro" />
       <main className="mx-auto flex max-w-md flex-col gap-6 px-6 py-16">
-        <Card as="section" padding="lg" elevation="raised" className="items-center text-center">
+        <Card as="section" padding="lg" className="items-center text-center">
           {status === 'verificando' && <p className="text-body text-ink-muted">Confirmando tu correo…</p>}
           {status === 'listo' && (
             <>

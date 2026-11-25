@@ -35,64 +35,67 @@
   --cl-on-success: #ffffff;
   --cl-warning: #e8a321;
   --cl-on-warning: #0f2a2e;
+  --cl-pending: #f97316;
+  --cl-on-pending: #2a1402;
   --cl-danger: #c93b3b;
   --cl-on-danger: #ffffff;
-  --cl-shadow-sm: 0 1px 2px rgba(15, 42, 46, 0.06), 0 1px 3px rgba(15, 42, 46, 0.08);
-  --cl-shadow-md: 0 8px 24px rgba(11, 127, 134, 0.12);
+  --cl-shadow-md: 0 4px 12px rgba(15, 42, 46, 0.1);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --cl-surface: #0a1a20;
-    --cl-surface-raised: #11262d;
-    --cl-surface-tint: #133a3c;
-    --cl-line: #22393f;
-    --cl-ink: #e6f2f3;
-    --cl-ink-muted: #9bb3ba;
+    --cl-surface: #010409;
+    --cl-surface-raised: #0d1117;
+    --cl-surface-tint: #161b22;
+    --cl-line: #30363d;
+    --cl-ink: #e6edf3;
+    --cl-ink-muted: #9198a1;
     --cl-primary: #40d6ce;
     --cl-on-primary: #05262a;
-    --cl-primary-soft: #10403f;
-    --cl-on-primary-soft: #95e8e3;
+    --cl-primary-soft: #2bb3ac;
+    --cl-on-primary-soft: #04201f;
     --cl-secondary: #7cc6f7;
     --cl-on-secondary: #08203a;
-    --cl-secondary-soft: #13324d;
-    --cl-on-secondary-soft: #a6d8fa;
+    --cl-secondary-soft: #5aa9e6;
+    --cl-on-secondary-soft: #071a2e;
     --cl-success: #4cc98d;
     --cl-on-success: #062018;
     --cl-warning: #e8a93a;
     --cl-on-warning: #2a1a02;
+    --cl-pending: #fb8532;
+    --cl-on-pending: #2a1402;
     --cl-danger: #f07272;
     --cl-on-danger: #2a0909;
-    --cl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --cl-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --cl-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --cl-surface: #0a1a20;
-  --cl-surface-raised: #11262d;
-  --cl-surface-tint: #133a3c;
-  --cl-line: #22393f;
-  --cl-ink: #e6f2f3;
-  --cl-ink-muted: #9bb3ba;
+  --cl-surface: #010409;
+  --cl-surface-raised: #0d1117;
+  --cl-surface-tint: #161b22;
+  --cl-line: #30363d;
+  --cl-ink: #e6edf3;
+  --cl-ink-muted: #9198a1;
   --cl-primary: #40d6ce;
   --cl-on-primary: #05262a;
-  --cl-primary-soft: #10403f;
-  --cl-on-primary-soft: #95e8e3;
+  --cl-primary-soft: #2bb3ac;
+  --cl-on-primary-soft: #04201f;
   --cl-secondary: #7cc6f7;
   --cl-on-secondary: #08203a;
-  --cl-secondary-soft: #13324d;
-  --cl-on-secondary-soft: #a6d8fa;
+  --cl-secondary-soft: #5aa9e6;
+  --cl-on-secondary-soft: #071a2e;
   --cl-success: #4cc98d;
   --cl-on-success: #062018;
   --cl-warning: #e8a93a;
   --cl-on-warning: #2a1a02;
+  --cl-pending: #fb8532;
+  --cl-on-pending: #2a1402;
   --cl-danger: #f07272;
   --cl-on-danger: #2a0909;
-  --cl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --cl-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --cl-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
 }
 
@@ -129,12 +132,13 @@
   --color-on-success: var(--cl-on-success); /* Texto sobre success. */
   --color-warning: var(--cl-warning); /* Pendiente, por confirmar; también las estrellas de calificación. */
   --color-on-warning: var(--cl-on-warning); /* Texto sobre warning. */
+  --color-pending: var(--cl-pending); /* Naranja: servicio pendiente de aceptar. */
+  --color-on-pending: var(--cl-on-pending); /* Texto sobre pending. */
   --color-danger: var(--cl-danger); /* Errores, cancelaciones, reportes. Nunca decorativo. */
   --color-on-danger: var(--cl-on-danger); /* Texto sobre danger. */
 
-  /* Sombras */
-  --shadow-sm: var(--cl-shadow-sm); /* Tarjetas en reposo. */
-  --shadow-md: var(--cl-shadow-md); /* Tarjeta al pasar el cursor, menús, modales. */
+  /* Sombras (solo lo que flota: tarjetas, botones e inputs van planos, con borde line) */
+  --shadow-md: var(--cl-shadow-md); /* Menús desplegables, sugerencias del buscador y modales. */
 }
 
 @theme {
@@ -188,9 +192,9 @@
   --spacing-12: 48px; /* Secciones de landing y márgenes de hero. */
 
   /* Radios */
-  --radius-sm: 6px; /* Inputs pequeños, checkboxes. */
-  --radius-md: 12px; /* Botones, inputs, tarjetas compactas. */
-  --radius-lg: 20px; /* Tarjetas de perfil, modales, bloques hero. */
+  --radius-sm: 3px; /* Badges, checkboxes, cuadros de icono pequeños. */
+  --radius-md: 6px; /* Botones, inputs, chips, filas de menú. */
+  --radius-lg: 8px; /* Tarjetas, paneles, menús y modales. */
 }
 
 @layer base {

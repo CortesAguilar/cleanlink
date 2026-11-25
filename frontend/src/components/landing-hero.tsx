@@ -31,7 +31,7 @@ function HeroIllustration() {
           <circle cx="440" cy="250" r="5" />
         </g>
       </svg>
-      <div className="absolute top-[34%] left-[22%] flex w-[280px] max-w-[70%] flex-col gap-3 rounded-lg bg-surface-raised p-4 shadow-md">
+      <div className="absolute top-[34%] left-[22%] flex w-[280px] max-w-[70%] flex-col gap-3 rounded-lg border border-line bg-surface-raised p-4">
         <div className="flex items-center gap-3">
           <Avatar name="Brillo Total" isGroup />
           <div className="flex min-w-0 flex-col">
@@ -78,7 +78,7 @@ export function LandingHero({ onSearch }: LandingHeroProps) {
               key={query}
               type="button"
               onClick={() => onSearch?.({ query, zone: '' })}
-              className="cursor-pointer rounded-full border border-line bg-surface-raised px-3 py-1.5 text-caption font-semibold text-ink transition-colors hover:border-primary"
+              className="cursor-pointer rounded-md border border-line bg-surface-raised px-3 py-1.5 text-caption font-semibold text-ink transition-colors hover:border-primary"
             >
               {query}
             </button>

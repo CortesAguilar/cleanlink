@@ -62,7 +62,7 @@ export function FeedView() {
           <ul className="grid gap-4 md:grid-cols-2">
             {featured.map((provider) => (
               <li key={provider.id}>
-                <SuggestionCard provider={provider} />
+                <SuggestionCard provider={provider} href={`/proveedor?id=${provider.id}`} />
               </li>
             ))}
           </ul>

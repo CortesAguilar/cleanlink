@@ -22,7 +22,7 @@ export function Chip({ selected = false, variant = 'soft', onClick, children }: 
   return (
     <button
       type="button"
-      className={`min-h-10 cursor-pointer rounded-full border border-line bg-surface-raised px-4 text-label text-ink transition hover:border-primary ${selectedStyles[variant]}`}
+      className={`min-h-10 cursor-pointer rounded-md border border-line bg-surface-raised px-4 text-label text-ink transition hover:border-primary ${selectedStyles[variant]}`}
       aria-pressed={selected}
       onClick={onClick}
     >

@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
 type CardPadding = 'sm' | 'md' | 'lg';
-type CardElevation = 'flat' | 'raised' | 'floating';
+type CardElevation = 'flat' | 'floating';
 type CardTone = 'raised' | 'tint';
 
 type CardProps = HTMLAttributes<HTMLElement> & {
@@ -11,7 +11,7 @@ type CardProps = HTMLAttributes<HTMLElement> & {
   padding?: CardPadding;
   elevation?: CardElevation;
   tone?: CardTone;
-  /** md (12px) para tarjetas compactas en listados; lg (20px) para perfiles, modales y bloques. */
+  /** md (6px) para tarjetas compactas en listados; lg (8px) para perfiles, modales y bloques. */
   radius?: 'md' | 'lg';
   children: ReactNode;
 };
@@ -24,7 +24,6 @@ const paddings: Record<CardPadding, string> = {
 
 const elevations: Record<CardElevation, string> = {
   flat: '',
-  raised: 'shadow-sm',
   floating: 'shadow-md',
 };
 
@@ -36,10 +35,10 @@ const tones: Record<CardTone, string> = {
 /**
  * Contenedor base de tarjetas, paneles y formularios.
  * - padding: sm (16px), md (20px), lg (32px).
- * - elevation: flat (solo borde), raised (shadow-sm), floating (shadow-md).
+ * - elevation: flat (solo borde, lo normal) o floating (shadow-md, solo modales y lo que flota).
  * - tone: raised (blanco) o tint (aqua muy claro, para banners).
- * - radius: md (12px) o lg (20px).
- * - as: etiqueta HTML. Las tarjetas que son enlaces se elevan al pasar el cursor.
+ * - radius: md (6px) o lg (8px).
+ * - as: etiqueta HTML. Las tarjetas que son enlaces marcan el borde en primary al pasar el cursor.
  */
 export function Card({
   as: Tag = 'div',
@@ -57,7 +56,7 @@ export function Card({
     paddings[padding],
     elevations[elevation],
     tones[tone],
-    Tag === 'a' ? 'transition-shadow hover:shadow-md' : '',
+    Tag === 'a' ? 'transition-colors hover:border-primary' : '',
     className,
   ].join(' ');
 

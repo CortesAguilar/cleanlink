@@ -37,7 +37,7 @@ export function clearSession() {
 /** Pantalla a la que va cada tipo de cuenta después de iniciar sesión. */
 export function homeFor(user: SessionUser) {
   if (user.accountType === 'admin') return '/admin';
-  return user.accountType === 'proveedor' ? '/mi-negocio' : '/feed';
+  return user.accountType === 'proveedor' ? '/panel' : '/feed';
 }
 
 /**

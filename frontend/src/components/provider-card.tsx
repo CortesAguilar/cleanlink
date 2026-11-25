@@ -20,7 +20,7 @@ export function ProviderCard({ provider, href }: ProviderCardProps) {
   const isGroup = provider.kind !== 'persona';
 
   return (
-    <Card as="a" href={href} elevation="raised" radius="md" className="h-full">
+    <Card as="a" href={href} radius="md" className="h-full">
       <div className="flex items-center gap-3">
         <Avatar name={provider.name} isGroup={isGroup} />
         <div className="flex min-w-0 flex-1 flex-col">

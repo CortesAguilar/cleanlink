@@ -15,6 +15,12 @@ export const statusLabels: Record<RequestStatus, string> = {
 /** Quién recibe el servicio: una persona, una empresa o una institución (escuela, gobierno, etc.). */
 export type ClientKind = 'persona' | 'empresa' | 'institucion';
 
+export const clientKindLabels: Record<ClientKind, string> = {
+  persona: 'Persona',
+  empresa: 'Empresa',
+  institucion: 'Institución',
+};
+
 /** Solicitud de servicio con su cotización. Contrato esperado de POST/GET /api/requests. */
 export type ServiceRequest = {
   id: string;

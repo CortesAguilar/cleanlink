@@ -53,7 +53,7 @@ const examples: Example[] = [
 /** Tarjeta de ejemplo de un grupo, como se vería en los resultados. */
 function ExampleCard({ example, className = '' }: { example: Example; className?: string }) {
   return (
-    <div className={`flex w-[300px] max-w-full flex-col gap-3 rounded-lg bg-surface-raised p-4 shadow-md ${className}`}>
+    <div className={`flex w-[300px] max-w-full flex-col gap-3 rounded-lg border border-line bg-surface-raised p-4 ${className}`}>
       <div className="flex items-center gap-3">
         <Avatar name={example.name} isGroup />
         <div className="flex min-w-0 flex-col">

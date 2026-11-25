@@ -72,7 +72,7 @@ function SaveBar({ state, label = 'Guardar cambios' }: { state: SaveState; label
 
 function Section({ title, onSubmit, children }: { title: string; onSubmit: (e: FormEvent) => void; children: ReactNode }) {
   return (
-    <Card as="section" padding="lg" elevation="raised">
+    <Card as="section" padding="lg">
       <form className="flex flex-col gap-5" onSubmit={onSubmit}>
         <h2 className="text-heading">{title}</h2>
         {children}

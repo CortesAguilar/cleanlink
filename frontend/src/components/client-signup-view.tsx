@@ -50,7 +50,7 @@ export function ClientSignupView() {
           <h1 className="text-title">Crea tu cuenta de cliente</h1>
           <p className="text-body-sm text-ink-muted">Para contratar servicios de limpieza y calificarlos.</p>
         </div>
-        <Card as="section" padding="lg" elevation="raised">
+        <Card as="section" padding="lg">
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <TextField
               label="Nombre"

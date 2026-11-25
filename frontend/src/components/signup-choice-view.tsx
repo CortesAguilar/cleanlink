@@ -51,7 +51,6 @@ export function SignupChoiceView() {
               as="a"
               href={option.href}
               padding="lg"
-              elevation="raised"
               className="group min-w-0 flex-[1_1_320px] gap-5 border-line hover:border-primary"
             >
               <span className="flex size-12 items-center justify-center rounded-md bg-primary text-on-primary">

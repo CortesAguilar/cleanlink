@@ -87,7 +87,7 @@ function ProviderProfile({ provider }: { provider: ProviderListing }) {
 
   return (
     <>
-      <Card as="section" padding="lg" elevation="raised" aria-labelledby="nombre-proveedor">
+      <Card as="section" padding="lg" aria-labelledby="nombre-proveedor">
         <div className="flex flex-wrap items-center gap-6">
           <Avatar name={provider.name} isGroup={isGroup} size={96} />
           <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-3">
@@ -117,7 +117,7 @@ function ProviderProfile({ provider }: { provider: ProviderListing }) {
 
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[999_1_480px] flex-col gap-6">
-          <Card as="section" padding="lg" elevation="raised" aria-labelledby="servicios">
+          <Card as="section" padding="lg" aria-labelledby="servicios">
             <div className="flex flex-col gap-1">
               <h2 id="servicios" className="text-heading">
                 Servicios que ofrece
@@ -155,7 +155,7 @@ function ProviderProfile({ provider }: { provider: ProviderListing }) {
             </ul>
           </Card>
 
-          <Card as="section" padding="lg" elevation="raised" aria-labelledby="resenas">
+          <Card as="section" padding="lg" aria-labelledby="resenas">
             <h2 id="resenas" className="text-heading">
               Reseñas
             </h2>
@@ -183,9 +183,7 @@ function ProviderProfile({ provider }: { provider: ProviderListing }) {
         </div>
 
         <aside className="flex min-w-0 flex-[1_1_340px] flex-col gap-6">
-          {pricing && <QuoteRequestCard provider={provider} pricing={pricing} />}
-
-          <Card padding="lg" elevation="raised" aria-labelledby="informacion">
+          <Card padding="lg" aria-labelledby="informacion">
             <h2 id="informacion" className="text-heading">
               Información
             </h2>
@@ -214,6 +212,8 @@ function ProviderProfile({ provider }: { provider: ProviderListing }) {
           </Card>
         </aside>
       </div>
+
+      {pricing && <QuoteRequestCard provider={provider} pricing={pricing} />}
     </>
   );
 }

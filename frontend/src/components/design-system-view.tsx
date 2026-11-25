@@ -155,7 +155,7 @@ function Spacing() {
 }
 
 function Radii() {
-  const all = [...radii, { key: 'full', value: '9999px', usage: 'Chips, badges, avatares.', name: '--radius-full' }];
+  const all = [...radii, { key: 'full', value: '9999px', usage: 'Solo avatares.', name: '--radius-full' }];
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
       {all.map((r) => (
@@ -222,7 +222,7 @@ function Components() {
 export function DesignSystemView() {
   return (
     <div className="min-h-svh">
-      <header className="sticky top-0 z-10 border-b border-line bg-surface-raised/95 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-line bg-surface-raised">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-4 py-3 md:px-6">
           <div className="flex items-baseline gap-2">
             <Logo href="#" />
@@ -266,11 +266,11 @@ export function DesignSystemView() {
           <Spacing />
         </Section>
 
-        <Section id="radios" title="Radios" intro="Suave y redondeado: nada con esquina viva.">
+        <Section id="radios" title="Radios" intro="Esquinas casi rectas (3, 6 y 8px): limpio y ordenado. Solo los avatares son redondos; chips, badges y botones no son píldora.">
           <Radii />
         </Section>
 
-        <Section id="sombras" title="Sombras" intro="Tenues, con tinte turquesa en claro; una tarjeta en reposo puede usar solo el borde line.">
+        <Section id="sombras" title="Sombras" intro="Todo es plano: tarjetas, botones e inputs usan solo el borde line, y al pasar el cursor cambia el borde, no la sombra. La única sombra es para lo que flota: menús, sugerencias y modales.">
           <Shadows />
         </Section>
 
